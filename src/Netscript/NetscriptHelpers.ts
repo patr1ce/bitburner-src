@@ -35,6 +35,14 @@ import { BaseServer } from "../Server/BaseServer";
 import { dialogBoxCreate } from "../ui/React/DialogBox";
 import { checkEnum } from "../utils/helpers/enum";
 
+let lastTime = Date.now();
+setInterval(() => (lastTime = Date.now()), 1000);
+// This event should prevent false positive timeout errors when user alt-tabs / otherwise hides the window
+document.addEventListener(
+  "visibilitychange",
+  () => (lastTime = document.visibilityState === "hidden" ? Infinity : Date.now()),
+);
+
 export const helpers = {
   string,
   number,
@@ -313,6 +321,13 @@ function checkEnvFlags(ctx: NetscriptContext): void {
       Currently running: ${ws.env.runningFn} tried to run: ${ctx.function}`,
       "CONCURRENCY",
     );
+  }
+  // 6s because lastTime only gets updated every 1s, so this allows scripts at least 5s of synchronous execution time.
+  if (Date.now() - 6000 > lastTime) {
+    // Prevent error getting piggybacked to another script due to a stale timer.
+    lastTime = Date.now();
+
+    throw makeRuntimeErrorMsg(ctx, "TODO: Make a better timeout error message.", "EXECUTION TIMEOUT");
   }
 }
 
