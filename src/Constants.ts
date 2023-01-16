@@ -88,7 +88,7 @@ export const CONSTANTS: {
   Donations: number; // number of blood/plasma/palette donation the dev have verified., boosts NFG
   LatestUpdate: string;
 } = {
-  VersionString: "2.2.2dev",
+  VersionString: "2.2test",
   VersionNumber: 29,
 
   // Speed (in ms) at which the main loop is updated
